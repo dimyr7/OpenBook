@@ -5,14 +5,12 @@
 class Transaction{
 	public:
 		Transaction(const std::time_t &dateTime, const std::string &note);
-		void addDebit(Account* account, Amount amount);
-		void addCredit(Account* accoumt, Amount amount);
+		void addEntry(Account* account, const Amount &amount);
 
-		bool apply();
+		void apply();
 
 	private:
-		std::vector<Entry> _debits;
-		std::vector<Entry> _credits;
+		std::vector<Entry> _entries;
 		std::time_t _dateTime;
 		std::string _note;
 

@@ -4,20 +4,18 @@
 #include <iostream>
 class Entry{
 	public:
-		Entry(Account* account, Type, type, Amount amount);
-		bool tryApply() const;
-		bool apply();
-
-		Type getType() const;
-		Amount getAmount() const;
-		std::string getAccountName() const;
-
-		void print(std::ostream &os) const;
+		Entry(Account* account, Amount amount);
+		void apply();
+		void reverse() noexcept;
 
 
+		double getAmount() const noexcept;
+		EntryType getEntryType() const noexcept;
+		std::string getAccountName() const noexcept;
+
+		friend std::ostream& operator<<(std::ostream &os, const Entry &entry) noexcept;
 	private:
 		Account* _account;
-		Type _type;
 		Amount _amount;
 
 };

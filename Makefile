@@ -43,31 +43,40 @@ $(TARGET): $(addprefix $(BUILDDIR), $(MAINOBJS) $(OBJS))
 	@echo " Building OpenBook"
 	$(LINKER) $(addprefix $(BUILDDIR), $(MAINOBJS) $(OBJS))  $(INC) $(LIBS) $(LFLAGS) $(TARGET)
 
-$(BUILDDIR)tester.o: $(TESTDIR)Tester.cpp
-	$(CC) $(CFLAGS) $(TESTDIR)Tester.cpp -o $(BUILDDIR)Tester.o
+#$(BUILDDIR)tester.o: $(TESTDIR)Tester.cpp
+#	$(CC) $(CFLAGS) $(TESTDIR)Tester.cpp -o $(BUILDDIR)Tester.o
 
 # Compiling main.o **DONE
-$(BUILDDIR)main.o: $(SRCDIR)Main.cpp $(addprefix $(BUILDDIR), account.o)
+$(BUILDDIR)main.o: $(SRCDIR)Main.cpp $(addprefix $(BUILDDIR), journal.o ledger.o)
 	$(CC) $(CFLAGS) $(SRCDIR)Main.cpp -o $(BUILDDIR)main.o
 
+
+# Compiling journal.o
+$(BUILDDIR)journal.o: $(SRCDIR)Journal.cpp $(addprefix $(BUILDDIR), transaction.o ledger.o)
+	$(CC) $(CFLAGS) $(SRCDIR)Journal.cpp -o $(BUILDDIR)journal.o
+
+
+# Compiling transaction.o
+$(BUILDDIR)transaction.o: $(SRCDIR)Transaction.cpp $(addprefix $(BUILDDIR), entry.o)
+	$(CC) $(CFLAGS) $(SRCDIR)Transaction.cpp -o $(BUILDDIR)transaction.o
+
+
+###############################################################################
+
+# Compiling entry.o
+$(BUILDDIR)entry.o: $(SRCDIR)Entry.cpp $(addprefix $(BUILDDIR), account.o amount.o)
+	$(CC) $(CFLAGS) $(SRCDIR)Entry.cpp -o $(BUILDDIR)entry.o
+
+# Compiling ledger.o
+$(BUILDDIR)ledger.o: $(SRCDIR)Ledger.cpp $(addprefix $(BUILDDIR), account.o)
+	$(CC) $(CFLAGS) $(SRCDIR)Ledger.cpp -o $(BUILDDIR)ledger.o
 
 # Compiling account.o
 $(BUILDDIR)account.o: $(SRCDIR)Account.cpp $(addprefix $(BUILDDIR), amount.o)
 	$(CC) $(CFLAGS) $(SRCDIR)Account.cpp -o $(BUILDDIR)account.o
 
-# Compiling entry.o
-$(BUILDDIR)entry.o: $(SRCDIR)Entry.cpp $(addprefix $(BUILDDIR), account.o)
-	$(CC) $(CFLAGS) $(SRCDIR)Entry.cpp -o $(BUILDDIR)entry.o
-
-# Compiling journal.o
-$(BUILDDIR)journal.o: $(SRCDIR)Journal.cpp $(addprefix $(BUILDDIR), ledger.o)
-	$(CC) $(CFLAGS) $(SRCDIR)Journal.cpp -o $(BUILDDIR)journal.o
-
-# Compiling ledger.o
-$(BUILDDIR)ledger.o: $(SRCDIR)Ledger.cpp
-	$(CC) $(CFLAGS) $(SRCDIR)Ledger.cpp -o $(BUILDDIR)ledger.o
-
-$(BUILDDIR)amount.o: $(SRCDIR)Amount.cpp include/Define.hpp
+# Compiling amount.o
+$(BUILDDIR)amount.o: $(SRCDIR)Amount.cpp
 	$(CC) $(CFLAGS) $(SRCDIR)Amount.cpp -o $(BUILDDIR)amount.o
 
 

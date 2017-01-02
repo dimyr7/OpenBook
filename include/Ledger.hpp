@@ -1,19 +1,21 @@
 #ifndef LEDGER_HPP
 #define LEDGER_HPP
 
+#include "Account.hpp"
+#include <vector>
+#include <map>
+
 class Ledger{
 	public:
 		Ledger();
+		//Ledger(rapidjson::Document);
 
 		Account* createAccount(const std::string &accountName, AccountType type);
 		Account* findAccount(const std::string &name) const;
 
+		friend std::ostream operator<<(std::ostream &os, const Ledger &ledger);
 		void print(std::ostream &os) const;
 	private:
-		std::vector<Account*> _assets;
-		std::vector<Account*> _liabs;
-		std::vector<Account*> _equity;
-		std::vector<Account*> _revenues;
-		std::vector<Account*> _expenses;
+		std::map<AccountType, std::vector<Account*> > _accounts;
 };
 #endif

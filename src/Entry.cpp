@@ -1,30 +1,36 @@
 #include "Entry.hpp"
 
-Entry::Entry(Account* accoumt. Type type, Amount amount)
-	: _account(account), _type(type), _amount(amount) { }
+Entry::Entry(Account* account, Amount amount)
+	: _account(account), _amount(amount) { }
 
-bool Entry::tryApply() const {
-	return _account->tryProcess(_type, _amount);
-}
-bool Entry::apply(){
-	return _account->process(_type, _amount);
-}
-
-Type Entry::getType() const {
-	return _type;
+void Entry::apply(){
+	try{
+		_account->process(_amount);
+	} catch(const std::exception &e){
+		throw e;
+	}
 }
 
-Amount Entry::getAmount() const {
-	return _amount;
+void Entry::reverse() noexcept{
+	_account->reverse();
 }
 
-std::string Entry::getAccountName() const {
+double Entry::getAmount() const noexcept {
+	return _amount.getValue();
+}
+
+EntryType Entry::getEntryType() const noexcept{
+	return _amount.getEntryType();
+}
+
+std::string Entry::getAccountName() const noexcept {
 	return _account->getName();
 }
 
-void Entry::print(std::ostream &os) const {
-	if(_type == Type::Credit) {
+std::ostream& operator<<(std::ostream &os, const Entry &entry) noexcept {
+	if(entry._amount.getEntryType() == iCREDIT) {
 		os << "\t";
 	}
-	os << this->geAccountName() << "\t" << toString(this->getAmount()) << std::endl;
+	os << entry.getAccountName() << "\t" << entry._amount;
+	return os;
 }

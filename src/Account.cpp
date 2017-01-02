@@ -1,44 +1,38 @@
 #include "Account.hpp"
 
-Account::Account(const std::string &name, Type type, Amount initAmount)
-	: _name(name), _type(type), _amount(initAmount){ }
+Account::Account(const std::string &name, AccountType type)
+	: _name(name), _type(type), _amount(0., balanceSideDict[type]),
+	_tempAmount(0., balanceSideDict[type]){ }
 
-bool Account::tryProcess(Type type, Amount amount) const {
-	if(type == Type::Credit and _amount < amount) {
-		return false;
+
+void Account::process(const Amount &amount){
+	try {
+		_tempAmount = _amount;
+		_amount+= amount;
+	} catch(const std::exception &e) {
+		std::cout << e.what() << std::endl;
+		throw e;
 	}
-	return true;
 }
 
-bool Account::process(Type type, Amount amount){
-	if(type == _type) {
-		_amount += amount
-	} else if(_amount < amount) {
-		return false;
-	} else {
-		_amount -= amount;
-	}
-	return true;
+void Account::reverse() noexcept{
+	_amount = _tempAmount;
 }
 
-std::string Account::getName() const {
+std::string Account::getName() const noexcept{
 	return _name;
 }
 
-Type Account::getType() const {
-	return _type
+AccountType Account::getType() const noexcept{
+	return _type;
 }
 
-Amount Account::getAmount() const {
-	return _amount;
+double Account::getAmount() const noexcept{
+	return _amount.getValue();
 }
 
-void Account::print(std::ostream &os) const {
-	os << _name << " - ";
-	if(Type == Type::Debit) {
-		os << "Dr: ";
-	} else {
-		os << "Cr: ";
-	}
-	os << toString(_amount);
+
+std::ostream& operator<<(std::ostream &os, const Account &acct) noexcept{
+	os << acct._name << " - " << (balanceSideDict[acct._type] == iDEBIT ? "Dr: " : "Cr: " ) << acct._amount;
+	return os;
 }
