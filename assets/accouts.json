@@ -1,0 +1,41 @@
+{
+	"assets":
+	[
+		{
+			"name": "Cash",
+			"number": 1001
+		},
+		{
+			"name": "A/R",
+			"number": 1100
+		}
+	],
+	"liabilities":
+	[
+		{
+			"name": "A/P",
+			"number": 2001
+		}
+	],
+	"equities":
+	[
+		{
+			"name": "Dima",
+			"number": 3001
+		}
+	],
+	"revenues":
+	[
+		{
+			"name": "Wolverine",
+			"number": 4001
+		}
+	],
+	"expenses":
+	[
+		{
+			"name": "Entertainment expense",
+			"number": 5001
+		}
+	]
+}

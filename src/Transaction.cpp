@@ -6,6 +6,7 @@ Transaction::Transaction(const std::time_t &dateTime, const std::string &note)
 void Transaction::addEntry(Account* account, const Amount &amount){
 	_entries.push_back({account, amount});
 }
+
 void Transaction::apply(){
 	int sum = 0;
 	std::cout << _dateTime << std::endl;
@@ -24,10 +25,11 @@ void Transaction::apply(){
 		try{
 			it->apply();
 		} catch(std::exception &e){
+			std::cout << e.what() << std::endl;
 			for(auto is = _entries.begin(); is != it; is++){
 				is->reverse();
 			}
-			break;
+			throw e;
 		}
 	}
 

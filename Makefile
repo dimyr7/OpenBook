@@ -2,9 +2,9 @@ OBJS = account.o entry.o journal.o ledger.o transaction.o amount.o
 MAINOBJS = main.o
 OBJPATH = ./build
 
-CC = clang++
-CFLAGS = -c -g -O0 -Wall -Werror -Wc++11-extensions -std=c++11 -I include -I libs
-LINKER = clang++
+CC = g++-6
+CFLAGS = -c -g -O0 -Wall -Werror -std=c++11 -I include -I libs
+LINKER = g++-6
 LFLAGS = -o
 
 ifdef DEBUG
@@ -25,7 +25,6 @@ SRCEXT = cpp
 INC = -I include
 all: $(TARGET)
 
-autoschedule: $(TARGET)
 
 test:
 	@echo "test runs"
@@ -50,18 +49,15 @@ $(TARGET): $(addprefix $(BUILDDIR), $(MAINOBJS) $(OBJS))
 $(BUILDDIR)main.o: $(SRCDIR)Main.cpp $(addprefix $(BUILDDIR), journal.o ledger.o)
 	$(CC) $(CFLAGS) $(SRCDIR)Main.cpp -o $(BUILDDIR)main.o
 
-
 # Compiling journal.o
 $(BUILDDIR)journal.o: $(SRCDIR)Journal.cpp $(addprefix $(BUILDDIR), transaction.o ledger.o)
 	$(CC) $(CFLAGS) $(SRCDIR)Journal.cpp -o $(BUILDDIR)journal.o
 
+###############################################################################
 
 # Compiling transaction.o
 $(BUILDDIR)transaction.o: $(SRCDIR)Transaction.cpp $(addprefix $(BUILDDIR), entry.o)
 	$(CC) $(CFLAGS) $(SRCDIR)Transaction.cpp -o $(BUILDDIR)transaction.o
-
-
-###############################################################################
 
 # Compiling entry.o
 $(BUILDDIR)entry.o: $(SRCDIR)Entry.cpp $(addprefix $(BUILDDIR), account.o amount.o)

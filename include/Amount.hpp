@@ -1,5 +1,6 @@
 #ifndef AMOUNT_HPP
 #define AMOUNT_HPP
+
 #include <iostream>
 
 typedef bool EntryType;

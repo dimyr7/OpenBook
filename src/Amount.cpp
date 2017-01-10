@@ -1,4 +1,5 @@
 #include "Amount.hpp"
+
 #include <stdexcept>
 
 /*

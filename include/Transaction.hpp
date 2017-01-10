@@ -1,7 +1,10 @@
 #ifndef TRANSACTION_HPP
 #define TRANSACTION_HPP
+
 #include "Entry.hpp"
+
 #include <vector>
+#include <ctime>
 class Transaction{
 	public:
 		Transaction(const std::time_t &dateTime, const std::string &note);

@@ -1,6 +1,7 @@
 #ifndef ENTRY_HPP
 #define ENTRY_HPP
 #include "Account.hpp"
+#include "Amount.hpp"
 #include <iostream>
 class Entry{
 	public:

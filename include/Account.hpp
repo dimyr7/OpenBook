@@ -1,9 +1,10 @@
 #ifndef ACCOUNT_HPP
 #define ACCOUNT_HPP
+
 #include "Amount.hpp"
+
 #include <string>
 #include <iostream>
-#include <map>
 
 enum class AccountType {
 	Asset = 1,
@@ -14,16 +15,9 @@ enum class AccountType {
 
 	END
 };
-std::map<AccountType, EntryType> balanceSideDict = {
-	{AccountType::Asset, iDEBIT},
-	{AccountType::Liability, iCREDIT},
-	{AccountType::Equity, iCREDIT},
-	{AccountType::Revenue, iCREDIT},
-	{AccountType::Expense, iDEBIT}
-};
 class Account{
 	public:
-		Account(const std::string &name, AccountType type);
+		Account(const std::string &name, AccountType type, size_t id);
 
 		void process(const Amount &amount);
 		void reverse() noexcept;
@@ -31,6 +25,7 @@ class Account{
 
 		std::string getName() const noexcept;
 		AccountType getType() const noexcept;
+		size_t getNumber() const noexcept;
 		double getAmount() const noexcept;
 
 		void print(std::ostream &os) const noexcept;
@@ -39,6 +34,7 @@ class Account{
 	private:
 		std::string _name;
 		AccountType _type;
+		size_t _id;
 		Amount _amount;
 		Amount _tempAmount;
 };
