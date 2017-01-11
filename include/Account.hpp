@@ -5,7 +5,7 @@
 
 #include <string>
 #include <iostream>
-
+#include <map>
 enum class AccountType {
 	Asset = 1,
 	Liability = 2,
@@ -31,6 +31,10 @@ class Account{
 		void print(std::ostream &os) const noexcept;
 
 		friend std::ostream& operator<<(std::ostream& os, const Account &acct) noexcept;
+
+		const static std::map<AccountType, EntryType> iACCT_TYPE_BALANCE_SIDE_DICT;
+		const static std::map<AccountType, std::string> iACCT_TYPE_STRING_DICT;
+		const static std::map<size_t, AccountType> iCODE_ACCT_TYPE_DICT;
 	private:
 		std::string _name;
 		AccountType _type;

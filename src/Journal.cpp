@@ -1,5 +1,4 @@
 #include "Journal.hpp"
-#include "Transaction.hpp"
 
 #include <iostream>
 #include <string>
@@ -8,17 +7,18 @@
 
 
 Journal::Journal(size_t month, size_t year, Ledger* ledger)
-	: _month(month), _year(year){ }
+	: _month(month), _year(year), _ledger(ledger){ }
 
+Journal::~Journal(){
+	// TODO
+}
 
 void Journal::newTransaction(const std::time_t &dateTime, const std::string &note){
-	Transaction* newTransaction = new Transaction( dateTime, note);
+	Transaction* newTransaction = new Transaction(dateTime, note);
 	// Proccess input from console for the new transaction
 	// Form: <D|C> <number> <amount>
-	std::cout << "### New Transcation" << std::endl;
 	while(true){
-		std::cout << "## New Entry" << std::endl;
-		std::cout << "> ";
+		std::cout << "entry> ";
 
 		// Checking for emptyline meaning that no more entries in this transaction
 		std::string entryInput;
@@ -26,6 +26,7 @@ void Journal::newTransaction(const std::time_t &dateTime, const std::string &not
 		if(entryInput == ""){
 			break;
 		}
+
 		// Parse the input for the values
 		char entryTypeChar ;
 		std::string accountID;
@@ -46,11 +47,12 @@ void Journal::newTransaction(const std::time_t &dateTime, const std::string &not
 
 		newTransaction->addEntry(foundAccount, std::move(entryAmount));
 	}
+	_transactions.push_back(newTransaction);
 
 	try{
 		newTransaction->apply();
 	} catch(const std::exception &e){
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 	}
 }
 bool Journal::close(){

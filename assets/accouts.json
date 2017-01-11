@@ -1,5 +1,5 @@
 {
-	"assets":
+	"asset":
 	[
 		{
 			"name": "Cash",
@@ -10,28 +10,28 @@
 			"number": 1100
 		}
 	],
-	"liabilities":
+	"liability":
 	[
 		{
 			"name": "A/P",
 			"number": 2001
 		}
 	],
-	"equities":
+	"equity":
 	[
 		{
 			"name": "Dima",
 			"number": 3001
 		}
 	],
-	"revenues":
+	"revenue":
 	[
 		{
 			"name": "Wolverine",
 			"number": 4001
 		}
 	],
-	"expenses":
+	"expense":
 	[
 		{
 			"name": "Entertainment expense",

@@ -1,7 +1,6 @@
 #include "Account.hpp"
-#include <map>
 
-const std::map<AccountType, EntryType> iBALANCE_SIDE_DICT = {
+const std::map<AccountType, EntryType> Account::iACCT_TYPE_BALANCE_SIDE_DICT = {
 	{AccountType::Asset, iDEBIT},
 	{AccountType::Liability, iCREDIT},
 	{AccountType::Equity, iCREDIT},
@@ -9,10 +8,26 @@ const std::map<AccountType, EntryType> iBALANCE_SIDE_DICT = {
 	{AccountType::Expense, iDEBIT}
 };
 
+const std::map<AccountType, std::string> Account::iACCT_TYPE_STRING_DICT = {
+	{AccountType::Asset, "asset"},
+	{AccountType::Liability, "liability"},
+	{AccountType::Equity, "equity"},
+	{AccountType::Revenue, "revenue"},
+	{AccountType::Expense, "expense"}
+};
+
+const std::map<size_t, AccountType> Account::iCODE_ACCT_TYPE_DICT= {
+	{1, AccountType::Asset},
+	{2, AccountType::Liability},
+	{3, AccountType::Equity},
+	{4, AccountType::Revenue},
+	{5, AccountType::Expense}
+};
+
 Account::Account(const std::string &name, const AccountType type, size_t id)
 	: _name(name), _type(type), _id(id),
-	_amount(0., iBALANCE_SIDE_DICT.at(type)),
-	_tempAmount(0., iBALANCE_SIDE_DICT.at(type)){ }
+	_amount(0., iACCT_TYPE_BALANCE_SIDE_DICT.at(type)),
+	_tempAmount(0., iACCT_TYPE_BALANCE_SIDE_DICT.at(type)){ }
 
 
 void Account::process(const Amount &amount){
@@ -20,7 +35,7 @@ void Account::process(const Amount &amount){
 		_tempAmount = _amount;
 		_amount+= amount;
 	} catch(const std::exception &e) {
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 		throw e;
 	}
 }
@@ -47,6 +62,8 @@ double Account::getAmount() const noexcept{
 
 
 std::ostream& operator<<(std::ostream &os, const Account &acct) noexcept{
-	os << acct._name << " - " << (iBALANCE_SIDE_DICT.at(acct._type) == iDEBIT ? "Dr: " : "Cr: " ) << acct._amount;
+	os << acct._name << " --------- " <<
+		(Account::iACCT_TYPE_BALANCE_SIDE_DICT.at(acct._type) == iDEBIT ? "Dr: " : "Cr: " )
+		<< acct._amount;
 	return os;
 }

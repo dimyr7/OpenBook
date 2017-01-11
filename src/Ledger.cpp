@@ -10,59 +10,40 @@
 #define iREVENUES "revenues"
 #define iEXPENSES "expenses"
 
-Ledger::Ledger(rapidjson::Document &acctDoc){
-	// Assets
-	assert(acctDoc.IsObject());
-	assert(acctDoc[iASSETS].IsArray());
-	for(rapidjson::SizeType i = 0; i < acctDoc[iASSETS].Size(); i++){
-		auto& acctInfo = acctDoc[iASSETS].GetArray()[i];
-		assert(acctInfo.HasMember("name"));
-		assert(acctInfo.HasMember("number"));
-		Account* newAcct = new Account(acctInfo["name"].GetString(), AccountType::Asset, acctInfo["number"].GetInt());
-		_accounts[AccountType::Asset].push_back(newAcct);
+Ledger::Ledger(rapidjson::Document &acctDoc) {
+	if(not acctDoc.IsObject()){
+		throw std::logic_error("Ledger file is not a valid JSON");
 	}
-	// Liabilities
-	assert(acctDoc.HasMember(iLIABILITIES));
-	assert(acctDoc[iLIABILITIES].IsArray());
-	for(rapidjson::SizeType i = 0; i < acctDoc[iLIABILITIES].Size(); i++){
-		auto& acctInfo = acctDoc[iLIABILITIES].GetArray()[i];
-		assert(acctInfo.HasMember("name"));
-		assert(acctInfo.HasMember("number"));
-		Account* newAcct = new Account(acctInfo["name"].GetString(), AccountType::Liability, acctInfo["number"].GetInt());
-		_accounts[AccountType::Liability].push_back(newAcct);
-	}
+	for(auto it = Account::iACCT_TYPE_STRING_DICT.cbegin();
+			it != Account::iACCT_TYPE_STRING_DICT.cend(); it++){
+		const char* acctTypeStr = it->second.c_str();
+		if(not acctDoc.HasMember(acctTypeStr)) {
+			throw std::logic_error("Ledger file doesn't have all types of accounts");
+		} else if(not acctDoc[acctTypeStr].IsArray()) {
+			throw std::logic_error("Each type of account must be listed in array form");
+		} else if(acctDoc[acctTypeStr].Size() < 1) {
+			throw std::logic_error("There must be at least 1 account for each type");
+		}
 
-	// Equities
-	assert(acctDoc.HasMember(iEQUITIES));
-	assert(acctDoc[iEQUITIES].IsArray());
-	for(rapidjson::SizeType i = 0; i < acctDoc[iEQUITIES].Size(); i++){
-		auto& acctInfo = acctDoc[iEQUITIES].GetArray()[i];
-		assert(acctInfo.HasMember("name"));
-		assert(acctInfo.HasMember("number"));
-		Account* newAcct = new Account(acctInfo["name"].GetString(), AccountType::Equity, acctInfo["number"].GetInt());
-		_accounts[AccountType::Equity].push_back(newAcct);
+		for(rapidjson::SizeType i = 0; i < acctDoc[acctTypeStr].Size(); i++){
+			auto& acctInfo = acctDoc[acctTypeStr].GetArray()[i];
+			if(not acctInfo.HasMember("name")){
+				throw std::logic_error("Each account must have a name");
+			} else if(not acctInfo.HasMember("number")) {
+				throw std::logic_error("Each account must have a number");
+			}
+			Account* newAcct = new Account(acctInfo["name"].GetString(),
+					it->first, acctInfo["number"].GetInt());
+			_accounts[it->first].push_back(newAcct);
+		}
 	}
+}
 
-	// Revenues
-	assert(acctDoc.HasMember(iREVENUES));
-	assert(acctDoc[iREVENUES].IsArray());
-	for(rapidjson::SizeType i = 0; i < acctDoc[iREVENUES].Size(); i++){
-		auto& acctInfo = acctDoc[iREVENUES].GetArray()[i];
-		assert(acctInfo.HasMember("name"));
-		assert(acctInfo.HasMember("number"));
-		Account* newAcct = new Account(acctInfo["name"].GetString(), AccountType::Revenue, acctInfo["number"].GetInt());
-		_accounts[AccountType::Revenue].push_back(newAcct);
-	}
-
-	// Expenses
-	assert(acctDoc.HasMember(iEXPENSES));
-	assert(acctDoc[iEXPENSES].IsArray());
-	for(rapidjson::SizeType i = 0; i < acctDoc[iEXPENSES].Size(); i++){
-		auto& acctInfo = acctDoc[iEXPENSES].GetArray()[i];
-		assert(acctInfo.HasMember("name"));
-		assert(acctInfo.HasMember("number"));
-		Account* newAcct = new Account(acctInfo["name"].GetString(), AccountType::Expense, acctInfo["number"].GetInt());
-		_accounts[AccountType::Expense].push_back(newAcct);
+Ledger::~Ledger() noexcept {
+	for(auto it = _accounts.begin(); it != _accounts.end(); it++){
+		for(auto is = it->second.begin(); is != it->second.end(); is++){
+			delete (*is);
+		}
 	}
 }
 
@@ -70,27 +51,14 @@ Ledger::Ledger(rapidjson::Document &acctDoc){
 Account* Ledger::findAccount(const std::string &name) const{
 	AccountType type;
 	int acctTypeCode = 0;
+	// TODO clean up this code. there should not be a try block within a try block
 	try{
 		size_t acctNumber = std::stoi(name);
 		acctTypeCode = std::stoi(name.substr(0,1));
-		switch (acctTypeCode){
-			case 1:
-				type = AccountType::Asset;
-				break;
-			case 2:
-				type = AccountType::Liability;
-				break;
-			case 3:
-				type = AccountType::Equity;
-				break;
-			case 4:
-				type = AccountType::Revenue;
-				break;
-			case 5:
-				type = AccountType::Expense;
-				break;
-			default:
-				throw std::logic_error("Incorrect account number");
+		try{
+			type = Account::iCODE_ACCT_TYPE_DICT.at(acctTypeCode);
+		} catch(std::exception &e) {
+			throw std::logic_error("Incorrect account number");
 		}
 		for(auto it = _accounts.at(type).begin(); it != _accounts.at(type).end(); it++){
 			if((*it)->getNumber() == acctNumber){
@@ -110,6 +78,17 @@ Account* Ledger::findAccount(const std::string &name) const{
 	return nullptr;
 }
 
-void Ledger::print(std::ostream &os) const {
-	// TODO
+Account* Ledger::findAccount(size_t acctNumber) const {
+	return nullptr;
 }
+
+
+void Ledger::printReports(std::ostream &os) const noexcept{
+	for(auto it = _accounts.begin(); it != _accounts.end(); it++){
+		os << "=== " << Account::iACCT_TYPE_STRING_DICT.at(it->first) << std::endl;
+		for(auto is = it->second.begin(); is != it->second.end(); is++){
+			os << *(*is) << std::endl;
+		}
+	}
+}
+

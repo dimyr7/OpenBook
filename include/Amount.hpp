@@ -15,9 +15,6 @@ class Amount{
 		 * @type is either Debit or Credit
 		 */
 		Amount(double value, EntryType type);
-		Amount(const Amount &other) noexcept;
-		Amount& operator=(const Amount& other) noexcept;
-
 
 		double getValue() const noexcept;
 		EntryType getEntryType() const noexcept;

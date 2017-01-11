@@ -16,22 +16,12 @@ Amount::Amount(double value, EntryType type) {
 Amount::Amount(size_t value, EntryType type) noexcept
 	: _value(value), _type(type) { }
 
-Amount::Amount(const Amount &other) noexcept{
-	this->_value = other._value;
-	this->_type = other._type;
-}
-
-Amount& Amount::operator=(const Amount& other) noexcept{
-	this->_value = other._value;
-	this->_type = other._type;
-	return *this;
-}
 /*
  * Getters
  */
 
 double Amount::getValue() const noexcept{
-	return (_value/100. + (_value%100));
+	return (_value/100.);
 }
 
 EntryType Amount::getEntryType() const noexcept{
@@ -53,7 +43,7 @@ Amount Amount::operator*(double scalar) const {
 	if(scalar < 0){
 		throw std::range_error("scalar cannot be negative");
 	}
-	return Amount(this->_value * scalar, this->_type);
+	return (Amount(this->_value * scalar, this->_type));
 }
 Amount& Amount::operator*=(double scalar) {
 	if(scalar < 0) {
@@ -67,7 +57,7 @@ Amount Amount::operator/(double scalar) const {
 	if(scalar == 0.){
 		throw std::overflow_error("Divide by 0 is not allowed");
 	}
-	return (*this)*(1./scalar);
+	return (Amount(this->_value , scalar/ this->_type));
 }
 Amount& Amount::operator/=(double scalar) {
 	if(scalar == 0.){
@@ -80,12 +70,12 @@ Amount& Amount::operator/=(double scalar) {
 
 Amount Amount::operator+(const Amount &other) const {
 	if(this->_type == other._type) {
-		return Amount(this->_value + other._value, this->_type);
+		return std::move(Amount(this->_value + other._value, this->_type));
 	}
 	if(other._value > this->_value){
 		throw std::range_error("value of LHS may not be negative");
 	}
-	return Amount(this->_value - other._value, this->_value);
+	return (Amount(this->_value - other._value, this->_value));
 }
 
 Amount& Amount::operator+=(const Amount &other) {

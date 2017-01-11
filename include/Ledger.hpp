@@ -11,12 +11,12 @@
 class Ledger{
 	public:
 		Ledger(rapidjson::Document &acctDoc);
+		~Ledger() noexcept;
 
 		Account* findAccount(const std::string &acctName) const;
 		Account* findAccount(size_t acctNumber) const;
 
-		friend std::ostream operator<<(std::ostream &os, const Ledger &ledger);
-		void print(std::ostream &os) const;
+		void printReports(std::ostream &os) const noexcept;
 	private:
 		std::map<AccountType, std::vector<Account*> > _accounts;
 };
