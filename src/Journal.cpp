@@ -10,7 +10,10 @@ Journal::Journal(size_t month, size_t year, Ledger* ledger)
 	: _month(month), _year(year), _ledger(ledger){ }
 
 Journal::~Journal(){
-	// TODO
+	for(auto it = _transactions.begin(); it != _transactions.end(); it++) {
+		delete *it;
+	}
+	_transactions.clear();
 }
 
 void Journal::newTransaction(const std::time_t &dateTime, const std::string &note){
@@ -55,7 +58,7 @@ void Journal::newTransaction(const std::time_t &dateTime, const std::string &not
 		std::cerr << e.what() << std::endl;
 	}
 }
-bool Journal::close(){
-	// TODO print monthly report
-	return false;
+void Journal::close(){
+	_ledger->printReports(std::cout);
+	_ledger->close();
 }

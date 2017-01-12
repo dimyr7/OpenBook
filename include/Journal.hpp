@@ -10,7 +10,7 @@ class Journal{
 		~Journal();
 
 		void newTransaction(const std::time_t &dateTime, const std::string &note);
-		bool close();
+		void close();
 
 	private:
 

@@ -17,7 +17,9 @@ class Ledger{
 		Account* findAccount(size_t acctNumber) const;
 
 		void printReports(std::ostream &os) const noexcept;
+		void close();
 	private:
 		std::map<AccountType, std::vector<Account*> > _accounts;
+		static size_t getAcctType(size_t acctNumber) noexcept;
 };
 #endif

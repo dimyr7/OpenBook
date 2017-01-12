@@ -3,13 +3,6 @@
 #include <iostream>
 #include <string>
 
-// TODO move these elsewhere
-#define iASSETS "assets"
-#define iLIABILITIES "liabilities"
-#define iEQUITIES "equities"
-#define iREVENUES "revenues"
-#define iEXPENSES "expenses"
-
 Ledger::Ledger(rapidjson::Document &acctDoc) {
 	if(not acctDoc.IsObject()){
 		throw std::logic_error("Ledger file is not a valid JSON");
@@ -49,24 +42,12 @@ Ledger::~Ledger() noexcept {
 
 
 Account* Ledger::findAccount(const std::string &name) const{
-	AccountType type;
-	int acctTypeCode = 0;
-	// TODO clean up this code. there should not be a try block within a try block
 	try{
 		size_t acctNumber = std::stoi(name);
-		acctTypeCode = std::stoi(name.substr(0,1));
-		try{
-			type = Account::iCODE_ACCT_TYPE_DICT.at(acctTypeCode);
-		} catch(std::exception &e) {
-			throw std::logic_error("Incorrect account number");
-		}
-		for(auto it = _accounts.at(type).begin(); it != _accounts.at(type).end(); it++){
-			if((*it)->getNumber() == acctNumber){
-				return (*it);
-			}
-		}
-	} catch(const std::exception &e) {
-		// Ignore, try looking by account name
+		Account* ret = this->findAccount(acctNumber);
+		return ret;
+	} catch(const std::invalid_argument &e) {
+		// A number was not entered
 		for(auto it = _accounts.begin(); it != _accounts.end(); it++){
 			for(auto is = it->second.begin(); is != it->second.end(); it++){
 				if((*is)->getName() == name){
@@ -75,10 +56,28 @@ Account* Ledger::findAccount(const std::string &name) const{
 			}
 		}
 	}
+	catch(const std::logic_error &e) {
+		// A number was enterered but it is illogical
+		throw e;
+	}
 	return nullptr;
 }
 
 Account* Ledger::findAccount(size_t acctNumber) const {
+	int acctTypeCode = 0;
+	AccountType type;
+	acctTypeCode = Ledger::getAcctType(acctNumber);
+	std::cout << acctTypeCode << std::endl;
+	try{
+		type = Account::iCODE_ACCT_TYPE_DICT.at(acctTypeCode);
+	} catch(std::exception &e) {
+		throw std::logic_error("Incorrect account number");
+	}
+	for(auto it = _accounts.at(type).begin(); it != _accounts.at(type).end(); it++){
+		if((*it)->getNumber() == acctNumber){
+			return (*it);
+		}
+	}
 	return nullptr;
 }
 
@@ -92,3 +91,12 @@ void Ledger::printReports(std::ostream &os) const noexcept{
 	}
 }
 
+
+size_t Ledger::getAcctType(size_t acctNumber) noexcept {
+	while(acctNumber > 9) {
+		acctNumber/= 10;
+	}
+	return acctNumber;
+}
+
+void Ledger::close(){ }
