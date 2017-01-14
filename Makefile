@@ -1,4 +1,4 @@
-OBJS = account.o entry.o journal.o ledger.o transaction.o amount.o
+OBJS = account.o entry.o journal.o ledger.o transaction.o amount.o color.o
 MAINOBJS = main.o
 OBJPATH = ./build
 
@@ -46,11 +46,11 @@ $(TARGET): $(addprefix $(BUILDDIR), $(MAINOBJS) $(OBJS))
 #	$(CC) $(CFLAGS) $(TESTDIR)Tester.cpp -o $(BUILDDIR)Tester.o
 
 # Compiling main.o **DONE
-$(BUILDDIR)main.o: $(SRCDIR)Main.cpp $(addprefix $(BUILDDIR), journal.o ledger.o)
+$(BUILDDIR)main.o: $(SRCDIR)Main.cpp $(addprefix $(BUILDDIR), journal.o ledger.o color.o)
 	$(CC) $(CFLAGS) $(SRCDIR)Main.cpp -o $(BUILDDIR)main.o
 
 # Compiling journal.o
-$(BUILDDIR)journal.o: $(SRCDIR)Journal.cpp $(addprefix $(BUILDDIR), transaction.o ledger.o)
+$(BUILDDIR)journal.o: $(SRCDIR)Journal.cpp $(addprefix $(BUILDDIR), transaction.o ledger.o color.o)
 	$(CC) $(CFLAGS) $(SRCDIR)Journal.cpp -o $(BUILDDIR)journal.o
 
 ###############################################################################
@@ -75,6 +75,9 @@ $(BUILDDIR)account.o: $(SRCDIR)Account.cpp $(addprefix $(BUILDDIR), amount.o)
 $(BUILDDIR)amount.o: $(SRCDIR)Amount.cpp
 	$(CC) $(CFLAGS) $(SRCDIR)Amount.cpp -o $(BUILDDIR)amount.o
 
+# Compiling color.o
+$(BUILDDIR)color.o: $(SRCDIR)Color.cpp
+	$(CC) $(CFLAGS) $(SRCDIR)Color.cpp -o $(BUILDDIR)color.o
 
 clean:
 	-rm -f build/*.o bin/openbook

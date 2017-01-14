@@ -7,10 +7,10 @@
 class Journal{
 	public:
 		Journal(size_t month, size_t year, Ledger* ledger);
-		~Journal();
+		~Journal() noexcept;
 
-		void newTransaction(const std::time_t &dateTime, const std::string &note);
-		void close();
+		void newTransaction(const std::time_t &dateTime, const std::string &note) noexcept;
+		void close() noexcept;
 
 	private:
 

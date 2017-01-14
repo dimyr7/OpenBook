@@ -3,39 +3,45 @@
 	[
 		{
 			"name": "Cash",
-			"number": 1001
+			"number": 1001,
+			"amount": 0.0
 		},
 		{
 			"name": "A/R",
-			"number": 1100
+			"number": 1100,
+			"amount": 0.0
 		}
 	],
 	"liability":
 	[
 		{
 			"name": "A/P",
-			"number": 2001
+			"number": 2001,
+			"amount": 0.0
 		}
 	],
 	"equity":
 	[
 		{
 			"name": "Dima",
-			"number": 3001
+			"number": 3001,
+			"amount": 0.0
 		}
 	],
 	"revenue":
 	[
 		{
 			"name": "Wolverine",
-			"number": 4001
+			"number": 4001,
+			"amount": 0.0
 		}
 	],
 	"expense":
 	[
 		{
 			"name": "Entertainment expense",
-			"number": 5001
+			"number": 5001,
+			"amount": 0.0
 		}
 	]
 }

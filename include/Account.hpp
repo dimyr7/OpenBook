@@ -17,8 +17,9 @@ enum class AccountType {
 };
 class Account{
 	public:
-		Account(const std::string &name, AccountType type, size_t id);
+		Account(const std::string &name, AccountType type, size_t id, double amount = 0.);
 
+		// TODO should this be operator+=
 		void process(const Amount &amount);
 		void reverse() noexcept;
 
@@ -26,7 +27,7 @@ class Account{
 		std::string getName() const noexcept;
 		AccountType getType() const noexcept;
 		size_t getNumber() const noexcept;
-		double getAmount() const noexcept;
+		Amount getAmount() const noexcept;
 
 		void print(std::ostream &os) const noexcept;
 

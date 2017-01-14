@@ -1,5 +1,7 @@
 #include "Journal.hpp"
 
+#include "color.hpp"
+
 #include <iostream>
 #include <string>
 #include <utility>
@@ -7,16 +9,16 @@
 
 
 Journal::Journal(size_t month, size_t year, Ledger* ledger)
-	: _month(month), _year(year), _ledger(ledger){ }
+	: _month(month), _year(year), _ledger(ledger) { }
 
-Journal::~Journal(){
+Journal::~Journal() noexcept{
 	for(auto it = _transactions.begin(); it != _transactions.end(); it++) {
 		delete *it;
 	}
 	_transactions.clear();
 }
 
-void Journal::newTransaction(const std::time_t &dateTime, const std::string &note){
+void Journal::newTransaction(const std::time_t &dateTime, const std::string &note) noexcept{
 	Transaction* newTransaction = new Transaction(dateTime, note);
 	// Proccess input from console for the new transaction
 	// Form: <D|C> <number> <amount>
@@ -58,7 +60,20 @@ void Journal::newTransaction(const std::time_t &dateTime, const std::string &not
 		std::cerr << e.what() << std::endl;
 	}
 }
-void Journal::close(){
-	_ledger->printReports(std::cout);
-	_ledger->close();
+
+void Journal::close() noexcept{
+	// print pre-balane sheet
+	std::cout << Color::GREEN << "=== Balance Sheet ===" << Color::RESET << std::endl;
+	_ledger->balanceSheet(std::cout);
+
+	// print income statement
+	std::cout << Color::GREEN << "=== Income Statement ===" << Color::RESET << std::endl;;
+	_ledger->incomeStatement(std::cout);
+
+	_ledger->closeAcctType(AccountType::Revenue);
+	_ledger->closeAcctType(AccountType::Expense);
+
+	// print post-balane sheet
+	std::cout << Color::GREEN << "=== Balance Sheet ===" << Color::RESET << std::endl;
+	_ledger->balanceSheet(std::cout);
 }

@@ -24,10 +24,10 @@ const std::map<size_t, AccountType> Account::iCODE_ACCT_TYPE_DICT= {
 	{5, AccountType::Expense}
 };
 
-Account::Account(const std::string &name, const AccountType type, size_t id)
+Account::Account(const std::string &name, const AccountType type, size_t id, double amount)
 	: _name(name), _type(type), _id(id),
-	_amount(0., iACCT_TYPE_BALANCE_SIDE_DICT.at(type)),
-	_tempAmount(0., iACCT_TYPE_BALANCE_SIDE_DICT.at(type)){ }
+	_amount(amount, iACCT_TYPE_BALANCE_SIDE_DICT.at(type)),
+	_tempAmount(amount, iACCT_TYPE_BALANCE_SIDE_DICT.at(type)){ }
 
 
 void Account::process(const Amount &amount){
@@ -56,8 +56,8 @@ size_t Account::getNumber() const noexcept{
 	return _id;
 }
 
-double Account::getAmount() const noexcept{
-	return _amount.getValue();
+Amount Account::getAmount() const noexcept{
+	return _amount;
 }
 
 
