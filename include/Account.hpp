@@ -19,7 +19,6 @@ class Account{
 	public:
 		Account(const std::string &name, AccountType type, size_t id, double amount = 0.);
 
-		// TODO should this be operator+=
 		void process(const Amount &amount);
 		void reverse() noexcept;
 

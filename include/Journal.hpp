@@ -6,7 +6,7 @@
 #include <vector>
 class Journal{
 	public:
-		Journal(size_t month, size_t year, Ledger* ledger);
+		explicit Journal(Ledger* ledger) ;
 		~Journal() noexcept;
 
 		void newTransaction(const std::time_t &dateTime, const std::string &note) noexcept;
@@ -15,8 +15,6 @@ class Journal{
 	private:
 
 
-		size_t _month;
-		size_t _year;
 		Ledger* _ledger;
 		std::vector<Transaction*> _transactions;
 };

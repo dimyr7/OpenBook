@@ -1,43 +1,69 @@
 #include "Ledger.hpp"
 #include "Transaction.hpp"
+#include "Color.hpp"
+
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/filewritestream.h"
 
 #include <iostream>
 #include <string>
 
-Ledger::Ledger(rapidjson::Document &acctDoc) {
+Ledger::Ledger(const rapidjson::Document &acctDoc) {
+	try{
+		Ledger::validateLedgerFile(acctDoc);
+	} catch(const std::exception &e) {
+		std::cout << Color::RED << e.what() << Color::RESET << std::endl;
+	}
+	// For each account type
+	// TODO DRY keep this nested for-loops non-repetative
+	for(auto it = Account::iACCT_TYPE_STRING_DICT.cbegin();
+			it != Account::iACCT_TYPE_STRING_DICT.cend(); it++){
+		const char* acctTypeStr = it->second.c_str();
+		// For each account in account type
+		for(rapidjson::SizeType i = 0; i < acctDoc[acctTypeStr].Size(); i++){
+			auto& acctInfo = acctDoc[acctTypeStr].GetArray()[i];
+			Account* newAcct = new Account(acctInfo["name"].GetString(),
+					it->first, acctInfo["number"].GetInt(),
+					acctInfo["amount"].GetDouble());
+
+			_accounts[it->first].push_back(newAcct);
+		}
+	}
+}
+
+void Ledger::validateLedgerFile(const rapidjson::Document &acctDoc) {
 	if(not acctDoc.IsObject()){
-		throw std::logic_error("Ledger file is not a valid JSON");
+		throw std::runtime_error("Ledger file is not a valid JSON");
 	}
 	// For each account type
 	for(auto it = Account::iACCT_TYPE_STRING_DICT.cbegin();
 			it != Account::iACCT_TYPE_STRING_DICT.cend(); it++){
 		const char* acctTypeStr = it->second.c_str();
 		if(not acctDoc.HasMember(acctTypeStr)) {
-			throw std::logic_error("Ledger file doesn't have all types of accounts");
+			throw std::runtime_error("Ledger file doesn't have all types of accounts");
 		} else if(not acctDoc[acctTypeStr].IsArray()) {
-			throw std::logic_error("Each type of account must be listed in array form");
+			throw std::runtime_error("Each type of account must be listed in array form");
 		} else if(acctDoc[acctTypeStr].Size() < 1) {
-			throw std::logic_error("There must be at least 1 account for each type");
+			throw std::runtime_error("There must be at least 1 account for each type");
 		}
 
 		// For each account in account type
 		for(rapidjson::SizeType i = 0; i < acctDoc[acctTypeStr].Size(); i++){
 			auto& acctInfo = acctDoc[acctTypeStr].GetArray()[i];
 			if(not acctInfo.HasMember("name")){
-				throw std::logic_error("Each account must have a name");
+				throw std::runtime_error("Each account must have a name");
 			} else if(not acctInfo.HasMember("number")) {
-				throw std::logic_error("Each account must have a number");
+				throw std::runtime_error("Each account must have a number");
 			} else if(not acctInfo.HasMember("amount")) {
-				throw std::logic_error("Each account must have a starting amount");
+				throw std::runtime_error("Each account must have a starting amount");
 			}
-
-			Account* newAcct = new Account(acctInfo["name"].GetString(),
-					it->first, acctInfo["number"].GetInt(),
-					acctInfo["amount"].GetDouble());
-			_accounts[it->first].push_back(newAcct);
 		}
 	}
 }
+
+Ledger::Ledger(const std::string &ledgerFilePath)
+	: Ledger(Ledger::openLedgerFile(ledgerFilePath)){ }
 
 Ledger::~Ledger() noexcept {
 	for(auto it = _accounts.begin(); it != _accounts.end(); it++){
@@ -76,7 +102,7 @@ Account* Ledger::findAccount(size_t acctNumber) const {
 	acctTypeCode = Ledger::getAcctType(acctNumber);
 	try{
 		type = Account::iCODE_ACCT_TYPE_DICT.at(acctTypeCode);
-	} catch(std::exception &e) {
+	} catch(const std::exception &e) {
 		throw std::logic_error("Incorrect account number");
 	}
 	for(auto it = _accounts.at(type).begin(); it != _accounts.at(type).end(); it++){
@@ -125,6 +151,7 @@ size_t Ledger::getAcctType(size_t acctNumber) noexcept {
 }
 
 void Ledger::closeAcctType(AccountType type) noexcept{
+	_saved = false;
 	Account* equityAcct = getEquityAcct();
 	for(auto it = _accounts.at(type).begin();
 			it != _accounts.at(type).end(); it++){
@@ -142,7 +169,57 @@ void Ledger::closeAcctType(AccountType type) noexcept{
 	}
 }
 
-void Ledger::close(){
-	// TODO create new transactions
+rapidjson::Document Ledger::openLedgerFile(const std::string &ledgerFilePath) {
+	FILE* pFile = fopen(ledgerFilePath.c_str(), "r");
+	char buffer[65536];
+	rapidjson::FileReadStream is(pFile, buffer, sizeof(buffer));
+	rapidjson::Document acctDoc;
+	acctDoc.ParseStream<0, rapidjson::UTF8<>, rapidjson::FileReadStream>(is);
+	fclose(pFile);
 
+	return acctDoc;
 }
+
+void Ledger::save(std::string &ledgerFilePath) const {
+	using namespace rapidjson;
+	std::cout << "Saving" << std::endl;
+	Document acctDoc = Ledger::openLedgerFile(ledgerFilePath);
+	try{
+		Ledger::validateLedgerFile(acctDoc);
+	} catch(const std::exception &e) {
+		std::cout << Color::RED << e.what() << Color::RESET << std::endl;
+	}
+
+	// For each account type
+	for(auto it = Account::iACCT_TYPE_STRING_DICT.cbegin();
+			it != Account::iACCT_TYPE_STRING_DICT.cend(); it++){
+		const char* acctTypeStr = it->second.c_str();
+		// For each account in account type
+		if(acctDoc[acctTypeStr].Size() != _accounts.at(it->first).size()){
+			throw std::logic_error("the accounst don't match up between ledger and ledger-file");
+		}
+		for(SizeType i = 0; i < acctDoc[acctTypeStr].Size(); i++){
+			auto& acctInfo = acctDoc[acctTypeStr].GetArray()[i];
+			Account* matchingAcct = findAccount(acctInfo["number"].GetInt());
+			if(matchingAcct == nullptr){
+				throw std::runtime_error("cannot find account in the ledger");
+			}
+			std::cout << "Setting value: " << matchingAcct->getAmount() << std::endl;
+			acctInfo["amount"] = matchingAcct->getAmount().getValue();
+			std::cout << "Set value: " << acctDoc[acctTypeStr].GetArray()[i]["amount"].GetDouble() << std::endl;
+		}
+	}
+	FILE* wFile = fopen(ledgerFilePath.c_str(), "w");
+
+	GenericStringBuffer< UTF8<> > buffer;
+	Writer<GenericStringBuffer< UTF8<> > > writer(buffer);
+	acctDoc.Accept(writer);
+	const char* str = buffer.GetString();
+	fprintf(wFile, "%s", str);
+	fclose(wFile);
+}
+
+bool Ledger::saved() const noexcept {
+	return _saved;
+}
+

@@ -8,8 +8,8 @@
 #include <sstream>
 
 
-Journal::Journal(size_t month, size_t year, Ledger* ledger)
-	: _month(month), _year(year), _ledger(ledger) { }
+Journal::Journal(Ledger* ledger)
+	: _ledger(ledger) { }
 
 Journal::~Journal() noexcept{
 	for(auto it = _transactions.begin(); it != _transactions.end(); it++) {
