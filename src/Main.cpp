@@ -5,7 +5,6 @@
 #include <sstream>
 
 // TODO imporive UI so that command line is more readable
-// TODO prompt user to save un-saved changes
 int main(int argc, char** argv){
 	// Pre-condition testing
 	if(argc > 2){
