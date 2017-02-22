@@ -1,11 +1,23 @@
 #include "Journal.hpp"
 #include "Ledger.hpp"
 #include "Color.hpp"
+
+#include <mysql_connection.h>
+
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+
 #include <iostream>
 #include <sstream>
 
 // TODO imporive UI so that command line is more readable
 int main(int argc, char** argv){
+	sql::Driver *driver = get_driver_instance();
+
+	std::cout << driver << std::endl;
+	return 0;
 	// Pre-condition testing
 	if(argc > 2){
 		std::cerr << Color::RED << "Not enough arguments" << Color::RESET << std::endl;

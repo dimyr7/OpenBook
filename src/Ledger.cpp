@@ -16,9 +16,8 @@ Ledger::Ledger(const rapidjson::Document &acctDoc) {
 		std::cout << Color::RED << e.what() << Color::RESET << std::endl;
 	}
 	// For each account type
-	// TODO DRY keep this nested for-loops non-repetative
-	for(auto it = Account::iACCT_TYPE_STRING_DICT.cbegin();
-			it != Account::iACCT_TYPE_STRING_DICT.cend(); it++){
+	for(auto it  = Account::iACCT_TYPE_STRING_DICT.cbegin();
+		   	 it != Account::iACCT_TYPE_STRING_DICT.cend(); it++){
 		const char* acctTypeStr = it->second.c_str();
 		// For each account in account type
 		for(rapidjson::SizeType i = 0; i < acctDoc[acctTypeStr].Size(); i++){

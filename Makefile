@@ -3,8 +3,9 @@ MAINOBJS = main.o
 OBJPATH = ./build
 
 CC = g++-6
-CFLAGS = -c -g -O0 -Wall -Werror -std=c++11 -I include -I libs
+CFLAGS = -c -g -O0 -Wall -Werror -std=c++11 -Iinclude -Ilibs -I/usr/local/include
 LINKER = g++-6
+LIBS = -L/usr/local/lib/ -lmysqlcppconn
 LFLAGS = -o
 
 ifdef DEBUG
