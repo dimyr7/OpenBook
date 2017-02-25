@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 Ledger::Ledger(const rapidjson::Document &acctDoc) {
 	try{
@@ -118,9 +119,28 @@ Account* Ledger::getEquityAcct() const {
 
 
 void Ledger::balanceSheet(std::ostream &os) const noexcept{
+	size_t maxStringLength = 0;
 	for(auto it = _accounts.begin(); it != _accounts.end(); it++){
-		os << "= " << Account::iACCT_TYPE_STRING_DICT.at(it->first) << std::endl;
-		for(auto is = it->second.begin(); is != it->second.end(); is++){ os << *(*is) << std::endl;
+		for(auto is = it->second.begin(); is != it->second.end(); is++){
+			std::stringstream unpaddedString;
+			unpaddedString << (*is)->getName() << (*is)->getAmount();
+			if(unpaddedString.str().length() > maxStringLength){
+				maxStringLength = unpaddedString.str().length();
+			}
+		}
+	}
+	maxStringLength += 5;
+	for(auto it = _accounts.begin(); it != _accounts.end(); it++){
+		os << "==== " << Color::WHITE << Account::iACCT_TYPE_STRING_DICT.at(it->first) << Color::RESET << std::endl;
+		for(auto is = it->second.begin(); is != it->second.end(); is++){
+			std::stringstream unpaddedString;
+			unpaddedString << (*is)->getName() << (*is)->getAmount();
+			size_t stringLength  = unpaddedString.str().length();
+			os << "\t" << (*is)->getName();
+			for(size_t i = stringLength; i < maxStringLength; i++){
+				os << ".";
+			}
+			os << (*is)->getAmount() << std::endl;
 		}
 	}
 }
@@ -130,15 +150,17 @@ void Ledger::incomeStatement(std::ostream &os) const noexcept {
 	for(auto it = _accounts.at(AccountType::Revenue).begin();
 			it != _accounts.at(AccountType::Revenue).end(); it++){
 		revenues += (*it)->getAmount();
+		std::cout << "\t" << *(*it) << std::endl;
 	}
-	std::cout << "Total revenue: " << revenues << std::endl;
+	std::cout << "Total revenue:\t\t" << revenues << std::endl;
 
 	Amount expenses(0., Account::iACCT_TYPE_BALANCE_SIDE_DICT.at(AccountType::Expense));
 	for(auto it = _accounts.at(AccountType::Expense).begin();
 			it != _accounts.at(AccountType::Expense).end(); it++){
 		expenses += (*it)->getAmount();
+		std::cout << "\t" << *(*it) << std::endl;
 	}
-	std::cout << "Total expense: " << expenses << std::endl;;
+	std::cout << "Total expense:\t\t" << expenses << std::endl;;
 }
 
 

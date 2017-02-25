@@ -9,5 +9,6 @@ class Color{
 		const static std::string RED;
 		const static std::string GREEN;
 		const static std::string YELLOW;
+		const static std::string WHITE;
 };
 #endif

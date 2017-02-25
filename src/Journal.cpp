@@ -23,7 +23,7 @@ void Journal::newTransaction(const std::time_t &dateTime, const std::string &not
 	// Proccess input from console for the new transaction
 	// Form: <D|C> <number> <amount>
 	while(true){
-		std::cout << "entry> ";
+		std::cout << "\tentry> ";
 
 		// Checking for emptyline meaning that no more entries in this transaction
 		std::string entryInput;

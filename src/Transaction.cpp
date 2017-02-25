@@ -23,13 +23,15 @@ void Transaction::apply(){
 	for(auto it = _entries.begin(); it != _entries.end(); it++){
 		try{
 			it->apply();
-		} catch(std::exception &e){
+		} catch(std::exception &e) {
 			std::cerr << e.what() << std::endl;
 			for(auto is = _entries.begin(); is != it; is++){
 				is->reverse();
 			}
 			throw e;
 		}
+		// Add to database
+
 	}
 
 }

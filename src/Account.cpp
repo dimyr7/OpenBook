@@ -62,8 +62,6 @@ Amount Account::getAmount() const noexcept{
 
 
 std::ostream& operator<<(std::ostream &os, const Account &acct) noexcept{
-	os << acct._name << " --------- " <<
-		(Account::iACCT_TYPE_BALANCE_SIDE_DICT.at(acct._type) == iDEBIT ? "Dr: " : "Cr: " )
-		<< acct._amount;
+	os << acct._name << " " << acct._amount;
 	return os;
 }

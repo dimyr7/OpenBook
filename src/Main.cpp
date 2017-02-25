@@ -17,10 +17,9 @@ int main(int argc, char** argv){
 	sql::Driver *driver = get_driver_instance();
 
 	std::cout << driver << std::endl;
-	return 0;
 	// Pre-condition testing
 	if(argc > 2){
-		std::cerr << Color::RED << "Not enough arguments" << Color::RESET << std::endl;
+		std::cerr << Color::RED << "Too many arguments" << Color::RESET << std::endl;
 		std::cout << "$ openbook <ledger file>" << std::endl;
 		exit(1);
 	}
@@ -43,8 +42,15 @@ int main(int argc, char** argv){
 		exit(1);
 	}
 	Journal* journal = new Journal(ledger);
+	std::cout << Color::GREEN << "Instructions:" << Color::RESET << std::endl;
+	std::cout << Color::YELLOW << "<p | print>" << Color::RESET << " - print the balance sheet" << std::endl;
+	std::cout << Color::YELLOW << "<t | trans | transaction>" << Color::RESET << " - create a new transaction" << std::endl;
+	std::cout << Color::YELLOW << "<c | close>" << Color::RESET << " - close the journal with the month and year" << std::endl;
+	std::cout << Color::YELLOW << "<s | save>" << Color::RESET << " - save the journal to file" << std::endl;
+	std::cout << Color::YELLOW << "<q | quit>" << Color::RESET << " - quit" << std::endl;
+
 	while(true){
-		std::cout << "openbook> ";
+		std::cout << Color::WHITE <<  "openbook> " << Color::RESET;
 		std::string command;
 		std::getline(std::cin, command);
 		std::stringstream commandStream(command);
@@ -76,7 +82,7 @@ int main(int argc, char** argv){
 			while(true){
 				std::cout << Color::BOLD << Color::GREEN << "New Transaction" << Color::RESET << std::endl;
 				std::string note;
-				std::cout << "note> ";
+				std::cout << "\tnote> ";
 				std::getline(std::cin, note);
 				if(note == ""){
 					break;
@@ -92,8 +98,6 @@ int main(int argc, char** argv){
 				std::cout << Color::RED << "A journal must be open before it can be closed" << Color::RESET << std::endl;
 			}
 			journal->close();
-			delete journal;
-			journal = nullptr;
 		} else if(inputCommands[0] == "s" or
 				inputCommands[0] == "save") {
 			savedLedger = true;
